@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">ParcelTracker</string>
+    <string name="add_parcel">Add Parcel</string>
+    <string name="search_by_tracking_number">Search by Tracking Number</string>
+    <string name="tracking_123456">Tracking #: 123456</string>
+    <string name="sender_john_doe">Sender: John Doe</string>
+    <string name="recipient_jane_smith">Recipient: Jane Smith</string>
+    <string name="status_in_transit">Status: In Transit</string>
+
+    <string name="tracking_number">Tracking #: </string>
+    <string name="sender">Sender: </string>
+    <string name="recipient">Recipient: </string>
+    <string name="status">Status: </string>
+    <string name="save_parcel">Save Parcel</string>
+    <string name="update_parcel">Update Parcel</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="history">History</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="address">Address</string>
+    <string name="add_update">Add Update</string>
+    <string name="hub_location">Hub/Location</string>
+    <string name="qr_code">QR Code</string>
+</resources>
