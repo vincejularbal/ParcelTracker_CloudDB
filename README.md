@@ -42,7 +42,7 @@ This project is a Kotlin-based Android mobile application designed to simulate a
 ## 📸 Demo Video
 
 *Link to 4–5 minute software demo and walkthrough:*  
-**[Add your unlisted YouTube or Google Drive link here]**
+(https://youtu.be/fXipWbvp31k)
 
 ---
 
