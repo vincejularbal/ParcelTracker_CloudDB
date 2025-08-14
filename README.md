@@ -23,7 +23,7 @@ The goal of this software is to gain practical experience integrating Android ap
 6. View tracking history for detailed progress logs.
 7. Sign out when finished.
 
-[Software Demo Video](http://youtube.link.goes.here)
+[Software Demo Video](https://youtu.be/c5sp87YkjsU)
 
 ---
 
