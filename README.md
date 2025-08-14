@@ -1,68 +1,77 @@
 # 📦 Parcel Tracker Android App  
-**Module 2 – Mobile App (Kotlin, Android Studio)**
+**Module 3 – Mobile App (Kotlin, Android Studio, Cloud Database)**
 
 ### 📌 Developer: Vincent Jularbal  
 **Course:** CSE 310 – Applied Programming  
 **Sprint Week:** July 2025  
-**Module Selected:** Mobile App (Module 2)
+**Module Selected:** Cloud Database (Module 3)
 
 ---
 
-## 📄 Project Description
+# Overview
 
-This project is a Kotlin-based Android mobile application designed to simulate a **Parcel Tracking System**. Users can add parcel records, update their delivery status and hub location, and view detailed tracking histories. The app also includes a **QR code generation and scanning** feature, allowing fast access to parcels using their tracking numbers.
+This project is an Android mobile application developed in Kotlin that functions as a **Parcel Tracking System** with cloud database integration. It allows users to add parcels, generate and scan QR codes for quick parcel lookup, update delivery status, view tracking history, and securely sign in using Firebase Authentication. All parcel data and tracking histories are stored in **Firebase Cloud Firestore**, ensuring that data is persistent and accessible from any device.
 
----
+The goal of this software is to gain practical experience integrating Android applications with a cloud backend, implementing user authentication, and handling real-time data synchronization. The app is designed for logistics and delivery tracking scenarios but can be adapted for other use cases where item tracking is needed.
 
-## ✅ Features Implemented
+**How to use:**
+1. Sign in or create an account using Email/Password authentication.
+2. Add a new parcel with a tracking number, recipient name, and address.
+3. The app automatically generates a QR code for the parcel.
+4. Scan a QR code to instantly open the parcel's record.
+5. Update parcel status and location as needed.
+6. View tracking history for detailed progress logs.
+7. Sign out when finished.
 
-- Add parcel records (tracking number, recipient, and address)
-- Generate and display QR code for each parcel
-- View all parcels in a card-based RecyclerView list
-- Update parcel status and hub location
-- Scan QR codes to find and open a parcel instantly
-- View detailed tracking history with timestamps
-- Delete parcels with confirmation
-
----
-
-## 📱 Technical Overview
-
-- **Language:** Kotlin  
-- **Platform:** Android (Min SDK 26, Target SDK 34)  
-- **IDE:** Android Studio  
-- **Libraries Used:**  
-  - ZXing Android Embedded (QR code scanning/generation)  
-  - AndroidX RecyclerView, CardView, AppCompat  
-  - Standard Android SDK components (Intent, Spinner, etc.)
-- **Storage:** In-memory only (via `MutableList`). Data persistence is not implemented for this module.
+[Software Demo Video](http://youtube.link.goes.here)
 
 ---
 
-## 📸 Demo Video
+# Cloud Database
 
-*Link to 4–5 minute software demo and walkthrough:*  
-(https://youtu.be/fXipWbvp31k)
+The app uses **Firebase Cloud Firestore** as its backend database.  
+**Structure:**
+- **`parcels`** (Collection)
+  - `trackingNumber` (String)
+  - `recipientName` (String)
+  - `address` (String)
+  - `qrBitmap` (Stored/generated locally, not in DB)
+- **`trackingHistory`** (Subcollection per parcel)
+  - `timestamp` (Date/Time)
+  - `status` (String)
+  - `location` (String)
+
+Firestore is configured to allow authenticated users to read/write only their own data, ensuring data security.
 
 ---
 
-## 📦 Requirements Met
+# Development Environment
 
-**✔ Basic Module Requirements**
-- App includes interactive UI screens
-- Accepts user input via forms and lists
-- Displays user output clearly in a scrollable list
-
-**✔ Unique Requirement Chosen**
-- Integrates with device camera to **scan a QR code** that holds a parcel’s tracking number and navigates to its record
+- **IDE:** Android Studio
+- **Language:** Kotlin
+- **Platform:** Android (Min SDK 26, Target SDK 36)
+- **Cloud Services:** Firebase Authentication, Firebase Cloud Firestore
+- **Libraries:**
+  - [Firebase Auth KTX](https://firebase.google.com/docs/auth/android/start)
+  - [Firebase Firestore KTX](https://firebase.google.com/docs/firestore/quickstart)
+  - [FirebaseUI Auth](https://github.com/firebase/FirebaseUI-Android) for simplified sign-in flow
+  - ZXing Android Embedded for QR code generation and scanning
+  - AndroidX RecyclerView, CardView, AppCompat, Material Components
 
 ---
 
-## 🛠 Setup Instructions
+# Useful Websites
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/parcel-tracker-android.git
-2. Open in Android Studio
-3. Sync Gradle (required libraries: ZXing, AndroidX)
-4. Run the app using an emulator or physical device with camera access
+- [Firebase Documentation](https://firebase.google.com/docs)
+- [FirebaseUI for Android](https://github.com/firebase/FirebaseUI-Android)
+- [ZXing QR Code Library](https://github.com/journeyapps/zxing-android-embedded)
+- [Android Developer Documentation](https://developer.android.com/docs)
+
+---
+
+# Future Work
+
+- Implement push notifications for status updates.
+- Add support for parcel images and file attachments.
+- Improve UI design for better user experience.
+- Add search and filtering capabilities for large parcel lists.
