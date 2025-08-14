@@ -7,6 +7,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 
 class ParcelAdapter(
     private var parcelList: List<Parcel>,
@@ -24,6 +26,7 @@ class ParcelAdapter(
         val btnViewHistory: Button = itemView.findViewById(R.id.btnViewHistory)
         val btnUpdate: Button = itemView.findViewById(R.id.btnUpdate)
         val btnDelete: Button = itemView.findViewById(R.id.btnDelete)
+        val imgQr: ImageView = itemView.findViewById(R.id.imgQrCode)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParcelViewHolder {
@@ -35,7 +38,7 @@ class ParcelAdapter(
     override fun onBindViewHolder(holder: ParcelViewHolder, position: Int) {
         val parcel = parcelList[position]
         val lastUpdate = parcel.history.lastOrNull()
-        val qrView = holder.itemView.findViewById<ImageView>(R.id.imgQrCode)
+        //val qrView = holder.itemView.findViewById<ImageView>(R.id.imgQrCode)
 
         holder.tvTrackingNumber.text = "Tracking #: ${parcel.trackingNumber}"
         holder.tvRecipient.text = "Recipient: ${parcel.recipientName}"
@@ -43,7 +46,24 @@ class ParcelAdapter(
         holder.tvStatus.text = "Status: ${lastUpdate?.status ?: "N/A"}"
         holder.tvLocation.text = "Location: ${lastUpdate?.location ?: "N/A"}"
 
-        qrView.setImageBitmap(parcel.qrBitmap)
+        // Generate QR only if missing (Firestore doesn’t store bitmaps)
+        if (parcel.qrBitmap == null) {
+            try {
+                val encoder = BarcodeEncoder()
+                parcel.qrBitmap = encoder.encodeBitmap(
+                    parcel.trackingNumber,
+                    BarcodeFormat.QR_CODE,
+                    260,
+                    260
+                )
+            } catch (_: Exception) {
+                // leave null; you could set a placeholder here if you want
+            }
+        }
+        holder.imgQr.setImageBitmap(parcel.qrBitmap)
+
+
+        //qrView.setImageBitmap(parcel.qrBitmap)
         holder.btnViewHistory.setOnClickListener { onViewHistory(parcel.trackingNumber) }
         holder.btnUpdate.setOnClickListener { onUpdate(parcel.trackingNumber) }
         holder.btnDelete.setOnClickListener { onDelete(parcel.trackingNumber) }

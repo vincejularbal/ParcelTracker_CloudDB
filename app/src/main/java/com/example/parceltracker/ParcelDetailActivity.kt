@@ -1,7 +1,6 @@
 package com.example.parceltracker
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
@@ -37,9 +36,9 @@ class ParcelDetailActivity : AppCompatActivity() {
         btnHistory = findViewById(R.id.btnViewHistory)
         btnDelete = findViewById(R.id.btnDelete)
 
-        val trackingNumber = intent.getStringExtra("trackingNumber")
-        val parcel = ParcelRepository.findParcelByTrackingNumber(trackingNumber ?: "")
+        val trackingNumber = intent.getStringExtra("trackingNumber") ?: ""
 
+        val parcel = ParcelRepository.findParcelByTrackingNumber(trackingNumber)
         if (parcel == null) {
             Toast.makeText(this, "Parcel not found", Toast.LENGTH_SHORT).show()
             finish()
@@ -53,6 +52,16 @@ class ParcelDetailActivity : AppCompatActivity() {
         val latest = parcel.history.lastOrNull()
         tvStatus.text = "Status: ${latest?.status ?: "N/A"}"
         tvLocation.text = "Location: ${latest?.location ?: "N/A"}"
+
+
+        if (parcel.qrBitmap == null) {
+            try {
+                val encoder = com.journeyapps.barcodescanner.BarcodeEncoder()
+                parcel.qrBitmap = encoder.encodeBitmap(parcel.trackingNumber,
+                    com.google.zxing.BarcodeFormat.QR_CODE, 300, 300)
+            } catch (_: Exception) { }
+        }
+
         imgQrCode.setImageBitmap(parcel.qrBitmap)
 
         btnHistory.setOnClickListener {
@@ -68,12 +77,13 @@ class ParcelDetailActivity : AppCompatActivity() {
         }
 
         btnDelete.setOnClickListener {
-            val removed = ParcelRepository.deleteParcel(parcel.trackingNumber)
-            if (removed) {
-                Toast.makeText(this, "Parcel deleted", Toast.LENGTH_SHORT).show()
-                finish()
-            } else {
-                Toast.makeText(this, "Delete failed", Toast.LENGTH_SHORT).show()
+            ParcelRepository.deleteParcel(parcel.trackingNumber) { ok, msg ->
+                if (ok) {
+                    Toast.makeText(this, "Parcel deleted", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "Delete failed: $msg", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

@@ -17,9 +17,9 @@ class HistoryActivity : AppCompatActivity() {
         tvHeader = findViewById(R.id.tvHeader)
         tvHistory = findViewById(R.id.tvHistory)
 
-        val trackingNumber = intent.getStringExtra("trackingNumber")
-        val parcel = ParcelRepository.findParcelByTrackingNumber(trackingNumber ?: "")
+        val trackingNumber = intent.getStringExtra("trackingNumber") ?: ""
 
+        val parcel = ParcelRepository.findParcelByTrackingNumber(trackingNumber)
         if (parcel == null) {
             Toast.makeText(this, "Parcel not found", Toast.LENGTH_SHORT).show()
             finish()
@@ -36,7 +36,7 @@ class HistoryActivity : AppCompatActivity() {
             tvHistory.text = "No tracking updates yet."
         } else {
             val updates = parcel.history.joinToString("\n\n") {
-                "🕒 ${it.timestamp}\n📍 ${it.location}\n🚚 ${it.status}"
+                "🕒 ${it.timestamp.toDate()}\n📍 ${it.location}\n🚚 ${it.status}"
             }
             tvHistory.text = updates
         }

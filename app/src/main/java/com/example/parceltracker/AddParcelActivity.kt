@@ -5,6 +5,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.zxing.BarcodeFormat
+import com.journeyapps.barcodescanner.BarcodeEncoder
 
 class AddParcelActivity : AppCompatActivity() {
 
@@ -18,12 +20,12 @@ class AddParcelActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_parcel)
 
         etTrackingNumber = findViewById(R.id.etTrackingNumber)
-        etRecipientName = findViewById(R.id.etRecipientName)
-        etAddress = findViewById(R.id.etAddress)
-        btnSaveParcel = findViewById(R.id.btnSaveParcel)
+        etRecipientName  = findViewById(R.id.etRecipientName)
+        etAddress        = findViewById(R.id.etAddress)
+        btnSaveParcel    = findViewById(R.id.btnSaveParcel)
 
         btnSaveParcel.setOnClickListener {
-            val tn = etTrackingNumber.text.toString().trim()
+            val tn   = etTrackingNumber.text.toString().trim()
             val name = etRecipientName.text.toString().trim()
             val addr = etAddress.text.toString().trim()
 
@@ -33,17 +35,21 @@ class AddParcelActivity : AppCompatActivity() {
             }
 
             val newParcel = Parcel(tn, name, addr)
-            try {
-                val encoder = com.journeyapps.barcodescanner.BarcodeEncoder()
-                val bitmap = encoder.encodeBitmap(tn, com.google.zxing.BarcodeFormat.QR_CODE, 300, 300)
-                newParcel.qrBitmap = bitmap
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            ParcelRepository.parcels.add(newParcel)
 
-            Toast.makeText(this, "Parcel added!", Toast.LENGTH_SHORT).show()
-            finish()
+            // Generate QR bitmap (not stored in Firestore)
+            try {
+                val encoder = BarcodeEncoder()
+                newParcel.qrBitmap = encoder.encodeBitmap(tn, BarcodeFormat.QR_CODE, 300, 300)
+            } catch (_: Exception) { }
+
+            ParcelRepository.addParcel(newParcel) { ok, msg ->
+                if (ok) {
+                    Toast.makeText(this, "Parcel added!", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "Save failed: $msg", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }

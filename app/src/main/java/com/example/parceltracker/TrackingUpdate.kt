@@ -1,9 +1,9 @@
 package com.example.parceltracker
 
-import java.time.LocalDateTime
+import com.google.firebase.Timestamp
 
 data class TrackingUpdate(
-    val timestamp: LocalDateTime,
-    val location: String,
-    val status: String
+    var timestamp: Timestamp = Timestamp.now(),
+    var location: String = "",
+    var status: String = ""
 )

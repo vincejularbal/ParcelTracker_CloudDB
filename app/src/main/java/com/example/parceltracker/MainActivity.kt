@@ -8,59 +8,62 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var parcelRecyclerView: RecyclerView
     private lateinit var adapter: ParcelAdapter
+
+    private val repoObserver: (List<Parcel>) -> Unit = { list ->
+        adapter.updateList(list)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         parcelRecyclerView = findViewById(R.id.parcelRecyclerView)
-
-        adapter = ParcelAdapter(ParcelRepository.parcels,
+        adapter = ParcelAdapter(
+            ParcelRepository.parcels,
             onViewHistory = { trackingNumber ->
-                val intent = Intent(this, HistoryActivity::class.java)
-                intent.putExtra("trackingNumber", trackingNumber)
-                startActivity(intent)
+                startActivity(Intent(this, HistoryActivity::class.java).apply {
+                    putExtra("trackingNumber", trackingNumber)
+                })
             },
             onUpdate = { trackingNumber ->
-                val intent = Intent(this, EditParcelActivity::class.java)
-                intent.putExtra("trackingNumber", trackingNumber)
-                startActivity(intent)
+                startActivity(Intent(this, EditParcelActivity::class.java).apply {
+                    putExtra("trackingNumber", trackingNumber)
+                })
             },
             onDelete = { trackingNumber ->
-                val removed = ParcelRepository.deleteParcel(trackingNumber)
-                if (removed) {
-                    Toast.makeText(this, "Parcel deleted", Toast.LENGTH_SHORT).show()
-                    refreshList()
-                } else {
-                    Toast.makeText(this, "Parcel not found", Toast.LENGTH_SHORT).show()
+                ParcelRepository.deleteParcel(trackingNumber) { ok, msg ->
+                    if (ok) {
+                        Toast.makeText(this, "Parcel deleted", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "Delete failed: $msg", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         )
-
         parcelRecyclerView.layoutManager = LinearLayoutManager(this)
         parcelRecyclerView.adapter = adapter
 
         findViewById<Button>(R.id.btnAddParcel).setOnClickListener {
             startActivity(Intent(this, AddParcelActivity::class.java))
         }
-
         findViewById<Button>(R.id.btnScanQR).setOnClickListener {
             startActivity(Intent(this, QRScannerActivity::class.java))
         }
-
     }
 
-    override fun onResume() {
-        super.onResume()
-        refreshList()
+    override fun onStart() {
+        super.onStart()
+        ParcelRepository.startListening()
+        ParcelRepository.addObserver(repoObserver)
     }
 
-    private fun refreshList() {
-        adapter.updateList(ParcelRepository.parcels)
+    override fun onStop() {
+        super.onStop()
+        ParcelRepository.removeObserver(repoObserver)
+        // (optional) keep listening globally by NOT calling stopListening()
     }
 }

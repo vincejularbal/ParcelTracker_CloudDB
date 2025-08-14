@@ -7,7 +7,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.time.LocalDateTime
+import com.google.firebase.Timestamp
 
 class EditParcelActivity : AppCompatActivity() {
 
@@ -29,33 +29,43 @@ class EditParcelActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerStatus.adapter = adapter
 
-        val trackingNumber = intent.getStringExtra("trackingNumber")
-        parcel = ParcelRepository.findParcelByTrackingNumber(trackingNumber ?: "")
+        val trackingNumber = intent.getStringExtra("trackingNumber") ?: ""
 
+        parcel = ParcelRepository.findParcelByTrackingNumber(trackingNumber)
         if (parcel == null) {
-            Toast.makeText(this, "Parcel not found", Toast.LENGTH_SHORT).show()
-            finish()
+            // Try fetching once from backend (in case local cache isn’t ready)
+            ParcelRepository.getParcelOnce(trackingNumber) { fetched ->
+                parcel = fetched
+                if (parcel == null) {
+                    Toast.makeText(this, "Parcel not found", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
         }
 
         btnAddUpdate.setOnClickListener {
             val location = etLocation.text.toString().trim()
             val status = spinnerStatus.selectedItem.toString()
 
-            if (location.isEmpty() || status.isEmpty()) {
-                Toast.makeText(this, "Fill both location and status", Toast.LENGTH_SHORT).show()
+            if (location.isEmpty()) {
+                Toast.makeText(this, "Enter a location", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             val update = TrackingUpdate(
-                timestamp = LocalDateTime.now(),
+                timestamp = Timestamp.now(),
                 location = location,
                 status = status
             )
 
-            parcel?.history?.add(update)
-
-            Toast.makeText(this, "Update added!", Toast.LENGTH_SHORT).show()
-            finish()
+            ParcelRepository.addUpdate(trackingNumber, update) { ok, msg ->
+                if (ok) {
+                    Toast.makeText(this, "Update added!", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "Failed to add update: $msg", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }
