@@ -63,12 +63,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Import the Firebase BoM (Bill of Materials)
-    implementation(platform(libs.firebase.bom.v3270)) // Check for the latest version!
+    // Firebase BoM
+    implementation(platform(libs.firebase.bom.v3351))
 
-    // Add the dependencies for the Firebase products you want to use
-    // For example, if you want Firebase Authentication and Cloud Firestore:
-    implementation(libs.firebase.auth.ktx) // For Kotlin
-    implementation(libs.com.google.firebase.firebase.firestore.ktx2) // For Kotlin
+    // Auth + Firestore from the BoM
+    implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.com.google.firebase.firebase.firestore.ktx3) // <— use the standard artifact
+
+    // FirebaseUI Auth (only once)
+    implementation(libs.firebase.ui.auth.v900)
 
 }
